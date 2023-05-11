@@ -16,7 +16,7 @@ const initializeDBAndServer = async () => {
       driver: sqlite3.Database,
     });
     app.listen(3000, () => {
-      console.log("Server Running at https://localhost:3000/");
+      console.log("Server Running at http://localhost:3000/");
     });
   } catch (e) {
     console.log(`DB Error: ${e.message}`);
@@ -47,8 +47,9 @@ app.post("/players/", async (request, response) => {
             ${playerName}, ${jerseyNumber}, ${role});
     `;
   const dbResponse = await db.run(addAPlayer);
-  response.send("Player added to the team");
-  // console.log("Player Added to Team");
+  const playerId = dbResponse.lastID;
+  response.send({ playerId: playerId });
+  console.log("Player Added to Team");
 });
 
 app.get("/players/:playerId/", async (request, response) => {
@@ -75,7 +76,6 @@ app.put("/players/:playerId/", async (request, response) => {
     role = ${role}
     WHERE player_id = ${playerId};
 
-    
     `;
   await db.run(updateDetails);
   response.send("Player Details Updated Successfully");
@@ -89,7 +89,7 @@ app.delete("/players/:playerId/", async (request, response) => {
     WHERE player_id = ${playerId};
     `;
   await db.get(deletePlayer);
-  response.send("Player Details Deleted Successfully");
+  response.send("Player Removed");
 });
 
 module.exports = app;
